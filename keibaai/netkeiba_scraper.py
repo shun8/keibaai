@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import os
 import logging.config
+import requests
+from bs4 import BeautifulSoup
 import re
 import sys
-import yaml
 
 base = os.path.dirname(os.path.abspath(__file__))
 LOGGING_CONF_FILE = os.path.normpath(os.path.join(base, "../conf/logging.ini"))
@@ -12,7 +13,7 @@ LOGGING_CONF_FILE = os.path.normpath(os.path.join(base, "../conf/logging.ini"))
 if os.path.exists(LOGGING_CONF_FILE):
     # logging.iniファイルがある場合設定を読み込む
     logging.config.fileConfig(LOGGING_CONF_FILE)
-    logger = logging.getLogger("regular")
+    logger = logging.getLogger("nkscraper")
 else:
     # logging.iniファイルがない場合すべてコンソールに出力
     handler = logging.StreamHandler()
@@ -40,6 +41,17 @@ def logging(func):
 class NetkeibaScraper:
     def __init__(self, db_client, sql_dir):
         base_url = "https://db.netkeiba.com/"
+        # ?year=2021&month=1
+        race_calendar_url = "https://race.netkeiba.com/top/calendar.html"
 
     @logging
+    def request_races_urls(self, year, month):
+        payload = {"year": year, "month": month}
+        r = requests.get(self.race_calendar_url, params=payload)
+
+        r.text
+
+        return r.text
+
+
     def 
