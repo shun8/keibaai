@@ -1,19 +1,20 @@
 import sqlalchemy
-from sqlalchemy import Column, BigInteger, Date, Integer, String
+from sqlalchemy import Column, BigInteger, Date, SmallInteger, String
+from sqlalchemy.sql.sqltypes import SmallInteger
 
 base = sqlalchemy.orm.declarative_base()
 
-class Race(base):
-    __tablename__ = 'races'
+class Course(base):
+    __tablename__ = 'courses'
 
-    cource_id = Column(BigInteger, primary_key=True)
-    name = Column(String)
+    id = Column(BigInteger, primary_key=True)
+    race_course_name = Column(String)
     surface = Column(String)
-    distance = Column(Integer)
+    distance = Column(SmallInteger)
     rotation = Column(String)
-
-
+    in_out = Column(String)
+    num_of_corners = Column(SmallInteger)
 
     def __repr__(self):
-        return "<Course(name='%s', distance='%s', date='%s')>" % (
-                            self.name, self.grade, self.date)
+        return "<Course(race_course_name='%s', distance='%s', surface='%s', rotation='%s')>" % (
+                            self.race_course_name, self.distance, self.surface, self.rotation)

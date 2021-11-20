@@ -4,7 +4,7 @@ from sqlalchemy import Column, BigInteger, DateTime, SmallInteger, String, Numer
 base = sqlalchemy.orm.declarative_base()
 
 class Win(base):
-    __tablename__ = 'win'
+    __tablename__ = 'odds_win'
 
     race_id = Column(BigInteger, primary_key=True)
     bracket_number = Column(SmallInteger)
