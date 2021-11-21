@@ -37,6 +37,7 @@ class RaceUma(base):
     age = Column(SmallInteger)
     weight_to_carry = Column(Float)
     jockey_id = Column(Integer)
+    win_odds = Column(Float)
     time = Column(Interval)
     margin = Column(String)
     final_3_furlong = Column(Interval)

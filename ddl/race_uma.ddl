@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS race_uma (
     age SMALLINT NOT NULL,
     weight_to_carry REAL,
     jockey_id INTEGER,
+    win_odds REAL,
     time INTERVAL MINUTE TO SECOND(1),
     margin VARCHAR(6),
     final_3_furlong INTERVAL MINUTE TO SECOND(1),
