@@ -7,7 +7,7 @@ base = sqlalchemy.orm.declarative_base()
 class Course(base):
     __tablename__ = 'courses'
 
-    id = Column(BigInteger, primary_key=True)
+    id = Column(String, primary_key=True)
     race_course_name = Column(String)
     surface = Column(String)
     distance = Column(SmallInteger)

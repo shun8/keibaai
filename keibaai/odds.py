@@ -16,15 +16,18 @@ class PlaceOdds(base):
 
     race_id = Column(BigInteger, primary_key=True)
     horse_number = Column(SmallInteger, primary_key=True)
-    odds = Column(Float)
+    odds_min = Column(Numeric)
+    odds_max = Column(Numeric)
     last_updated = Column(DateTime)
 
 class QuinellaPlaceOdds(base):
     __tablename__ = 'quinella_place_odds'
 
     race_id = Column(BigInteger, primary_key=True)
-    horse_number = Column(SmallInteger, primary_key=True)
-    odds = Column(Numeric)
+    horse_number_1 = Column(SmallInteger, primary_key=True)
+    horse_number_2 = Column(SmallInteger, primary_key=True)
+    odds_min = Column(Numeric)
+    odds_max = Column(Numeric)
     last_updated = Column(DateTime)
 
 class BracketQuinellaOdds(base):

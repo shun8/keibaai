@@ -57,7 +57,7 @@ class RaceLapTimes(base):
 
     race_id = Column(BigInteger, primary_key=True)
     lap_distance = Column(SmallInteger, primary_key=True)
-    lap_time = Column(Interval)
+    lap_time = Column(Float)
 
     def __repr__(self):
         return "<RaceUma(lap_distance='%s', lap_time='%s'>" % (

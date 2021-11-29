@@ -8,14 +8,17 @@ CREATE TABLE IF NOT EXISTS win_odds (
 CREATE TABLE IF NOT EXISTS place_odds (
     race_id BIGINT PRIMARY KEY,
     horse_number SMALLINT PRIMARY KEY,
-    odds REAL,
+    odds_min REAL,
+    odds_max REAL,
     last_updated Timestamp
 );
 
 CREATE TABLE IF NOT EXISTS quinella_place_odds (
     race_id BIGINT PRIMARY KEY,
-    horse_number SMALLINT PRIMARY KEY,
-    odds REAL,
+    horse_number_1 SMALLINT PRIMARY KEY,
+    horse_number_2 SMALLINT PRIMARY KEY,
+    odds_min REAL,
+    odds_max REAL,
     last_updated Timestamp
 );
 
@@ -52,3 +55,11 @@ CREATE TABLE IF NOT EXISTS trifecta_odds (
     last_updated Timestamp
 );
 
+CREATE TABLE IF NOT EXISTS trio_odds (
+    race_id BIGINT PRIMARY KEY,
+    horse_number_1 SMALLINT PRIMARY KEY,
+    horse_number_2 SMALLINT PRIMARY KEY,
+    horse_number_3 SMALLINT PRIMARY KEY,
+    odds DOUBLE PRECISION,
+    last_updated Timestamp
+);

@@ -1,3 +1,5 @@
 __pycache__/
 *.log
 *.xlsx
+/conf/db_connection.yaml
+.ipynb_checkpoints/
