@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS win_odds (
     race_id BIGINT PRIMARY KEY,
     horse_number SMALLINT PRIMARY KEY,
     odds REAL,
-    last_updated Timestamp
+    last_updated TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS place_odds (
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS place_odds (
     horse_number SMALLINT PRIMARY KEY,
     odds_min REAL,
     odds_max REAL,
-    last_updated Timestamp
+    last_updated TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS quinella_place_odds (
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS quinella_place_odds (
     horse_number_2 SMALLINT PRIMARY KEY,
     odds_min REAL,
     odds_max REAL,
-    last_updated Timestamp
+    last_updated TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS bracket_quinella_odds (
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS bracket_quinella_odds (
     bracket_number_1 SMALLINT PRIMARY KEY,
     bracket_number_2 SMALLINT PRIMARY KEY,
     odds REAL,
-    last_updated Timestamp
+    last_updated TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS exacta_odds (
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS exacta_odds (
     horse_number_1 SMALLINT PRIMARY KEY,
     horse_number_2 SMALLINT PRIMARY KEY,
     odds REAL,
-    last_updated Timestamp
+    last_updated TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS quinella_odds (
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS quinella_odds (
     horse_number_1 SMALLINT PRIMARY KEY,
     horse_number_2 SMALLINT PRIMARY KEY,
     odds REAL,
-    last_updated Timestamp
+    last_updated TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS trifecta_odds (
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS trifecta_odds (
     horse_number_2 SMALLINT PRIMARY KEY,
     horse_number_3 SMALLINT PRIMARY KEY,
     odds DOUBLE PRECISION,
-    last_updated Timestamp
+    last_updated TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS trio_odds (
@@ -61,5 +61,5 @@ CREATE TABLE IF NOT EXISTS trio_odds (
     horse_number_2 SMALLINT PRIMARY KEY,
     horse_number_3 SMALLINT PRIMARY KEY,
     odds DOUBLE PRECISION,
-    last_updated Timestamp
+    last_updated TIMESTAMP
 );

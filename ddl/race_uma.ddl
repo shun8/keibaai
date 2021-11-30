@@ -11,11 +11,11 @@ CREATE TABLE IF NOT EXISTS race_uma (
     win_odds REAL,
     time REAL,
     margin VARCHAR(6),
-    final_3_furlong INTERVAL MINUTE TO SECOND(1),
+    final_3_furlong REAL,
     corner_order VARCHAR(12),
     trainer_id INTEGER NOT NULL,
     horse_weight SMALLINT,
     gain_and_loss_weight SMALLINT,
-    is_excluded BOOLEAN,
-    is_demoted BOOLEAN
+    is_excluded CHAR(1),
+    is_demoted CHAR(1)
 );

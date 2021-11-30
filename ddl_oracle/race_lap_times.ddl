@@ -1,5 +1,6 @@
-CREATE TABLE IF NOT EXISTS race_lap_times (
-    race_id BIGINT PRIMARY KEY,
-    lap_distance SMALLINT PRIMARY_KEY,
-    lap_time 
+CREATE TABLE race_lap_times (
+    race_id NUMBER(12),
+    lap_distance NUMBER(4),
+    lap_time NUMBER(3,1),
+    PRIMARY KEY (race_id, lap_distance)
 );
