@@ -1,3 +1,4 @@
+from re import S
 import sqlalchemy
 from sqlalchemy import Column, BigInteger, Boolean, Date, Float, Integer, Interval, SmallInteger, String, Time
 
@@ -14,6 +15,9 @@ class Race(base):
     course_id = Column(Integer)
     going = Column(String)
     weather = Column(String)
+    kai = Column(SmallInteger)
+    nichi = Column(SmallInteger)
+    handicap = Column(String)
     race_data = Column(String)
     corner_order_1 = Column(String)
     corner_order_2 = Column(String)
@@ -45,8 +49,8 @@ class RaceUma(base):
     trainer_id = Column(Integer)
     horse_weight = Column(SmallInteger)
     gain_and_loss_weight = Column(SmallInteger)
-    is_excluded = Column(Boolean)
-    is_demoted = Column(Boolean)
+    is_excluded = Column(String)
+    is_demoted = Column(String)
 
     def __repr__(self):
         return "<RaceUma(bracket_number='%s', horse_number='%s', result='%s')>" % (

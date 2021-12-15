@@ -8,7 +8,7 @@ class Course(base):
     __tablename__ = 'courses'
 
     id = Column(String, primary_key=True)
-    race_course_name = Column(String)
+    race_course_id = Column(SmallInteger)
     surface = Column(String)
     distance = Column(SmallInteger)
     rotation = Column(String)
