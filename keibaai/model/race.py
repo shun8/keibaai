@@ -1,6 +1,6 @@
 from re import S
 import sqlalchemy
-from sqlalchemy import Column, BigInteger, Boolean, Date, Float, Integer, Interval, SmallInteger, String, Time
+from sqlalchemy import Column, BigInteger, Date, Float, Integer, Interval, SmallInteger, String, Time
 
 base = sqlalchemy.orm.declarative_base()
 
@@ -8,22 +8,26 @@ class Race(base):
     __tablename__ = 'races'
 
     id = Column(BigInteger, primary_key=True)
-    name = Column(String)
-    grade = Column(String)
-    date = Column(Date)
-    start = Column(Time)
-    course_id = Column(Integer)
-    going = Column(String)
-    weather = Column(String)
+    name = Column(String(30))
+    race_track_id = Column(SmallInteger)
     kai = Column(SmallInteger)
     nichi = Column(SmallInteger)
-    handicap = Column(String)
-    race_data = Column(String)
-    corner_order_1 = Column(String)
-    corner_order_2 = Column(String)
-    corner_order_3 = Column(String)
-    corner_order_4 = Column(String)
-    pace = Column(String)
+    race_no = Column(SmallInteger)
+    course_id = Column(String(20))
+    grade_id = Column(SmallInteger)
+    is_win5 = Column(String(1))
+    condition = Column(String(10))
+    handicap = Column(String(2))
+    race_date = Column(Date)
+    race_start = Column(String(5))
+    weather = Column(String(4))
+    going = Column(String(2))
+    race_data = Column(String(100))
+    corner_order_1 = Column(String(60))
+    corner_order_2 = Column(String(60))
+    corner_order_3 = Column(String(60))
+    corner_order_4 = Column(String(60))
+    pace = Column(String(1))
 
     def __repr__(self):
         return "<Race(name='%s', grade='%s', date='%s')>" % (

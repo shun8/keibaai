@@ -12,6 +12,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 import urllib
 
 import model.odds as odds
+import model.race as race
 
 base = os.path.dirname(os.path.abspath(__file__))
 LOGGING_CONF_FILE = os.path.normpath(os.path.join(base, "../conf/logging.ini"))
@@ -149,19 +150,37 @@ class NetkeibaScraper:
 
     @staticmethod
     def _get_last_updated(soup):
-        last_updated = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
+        last_updated = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
         last_updated.replace(
                 second=0, 
                 microsecond=0)
-        official_time_tag = soup.select_one('#offical_time')
+        official_time_tag = soup.select_one("#offical_time")
         if official_time_tag is not None:
             time_str = re.search(r"\d+:\d+", official_time_tag.contents[0]).match
             l = time_str.split(":")
             last_updated.replace(
                     hour=int(l[0]),
                     minute=int(l[1]))
+        return last_updated
 
     @staticmethod
-    def _get_race_data(soup):
+    def _get_race_data(race_id, soup):
+        race_data = race.Race()
+        rd1 = soup.select_one(".RaceData01")
+        rd2 = soup.select_one(".RaceData02")
 
+        race_data.id = race_id
+        race_data.name = soup.select_one(".RaceName").contents[0].strip()
+        race_data.race_track_id = int(race_id[5:7])
+        race_data.kai = int(race_id[7:9])
+        race_data.nichi = int(race_id[9:11])
+        race_data.race_no = int(race_id[11:13])
+
+        mrbtn = soup.select_one(".MapRaceBtn")
+        m = re.search(r"/([^ \t<>/]+)\.png", mrbtn.get("href"))
+        race_data.course_id = m.group(1)
+
+        gt = soup.select(".Icon_GradeType")
+        m = re.search(r"Icon_GradeType([0-9]+)", str(gt[0]))
+        race_data.grade_id = int(m.group(1))
 
