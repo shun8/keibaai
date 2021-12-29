@@ -22,6 +22,7 @@ class Race(base):
     race_start = Column(String(5))
     weather = Column(String(4))
     going = Column(String(2))
+    num_of_horses = Column(SmallInteger)
     race_data = Column(String(100))
     corner_order_1 = Column(String(60))
     corner_order_2 = Column(String(60))

@@ -10,6 +10,7 @@ import pytz
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 import urllib
+from keibaai.model.race import Race
 
 import model.odds as odds
 import model.race as race
@@ -166,9 +167,6 @@ class NetkeibaScraper:
     @staticmethod
     def _get_race_data(race_id, soup):
         race_data = race.Race()
-        rd1 = soup.select_one(".RaceData01")
-        rd2 = soup.select_one(".RaceData02")
-
         race_data.id = race_id
         race_data.name = soup.select_one(".RaceName").contents[0].strip()
         race_data.race_track_id = int(race_id[5:7])
@@ -180,7 +178,168 @@ class NetkeibaScraper:
         m = re.search(r"/([^ \t<>/]+)\.png", mrbtn.get("href"))
         race_data.course_id = m.group(1)
 
-        gt = soup.select(".Icon_GradeType")
-        m = re.search(r"Icon_GradeType([0-9]+)", str(gt[0]))
-        race_data.grade_id = int(m.group(1))
+        race_data.grade_id, race_data.is_win5 = NetkeibaScraper._get_grade_id(soup)
+        race_data.condition = NetkeibaScraper._get_race_condition(soup)
+        race_data.handicap = NetkeibaScraper._get_handicap(soup)
+        race_data.race_start = NetkeibaScraper._get_race_start(soup)
+        race_data.weather = NetkeibaScraper._get_weather(soup)
+        race_data.going = NetkeibaScraper._get_going(soup)
+        race_data.num_of_horses = NetkeibaScraper._get_num_of_horses(soup)
+
+        corner_orders = NetkeibaScraper._get_corner_orders(soup)
+        if len(corner_orders) > 0:
+            race_data.corner_order_1 = corner_orders[0]
+        if len(corner_orders) > 1:
+            race_data.corner_order_2 = corner_orders[1]
+        if len(corner_orders) > 2:
+            race_data.corner_order_3 = corner_orders[2]
+        if len(corner_orders) > 3:
+            race_data.corner_order_4 = corner_orders[3]
+
+        race_data.pace = NetkeibaScraper._get_pace(soup)
+
+        race_lap_times = NetkeibaScraper._get_lap_times(race_id, soup)
+        race_umas = NetkeibaScraper._get_race_umas(race_id, soup)
+
+    @staticmethod
+    def _get_grade_id(soup):
+        grade_id = 99
+        is_win5 = "0"
+        gts = soup.select(".Icon_GradeType")
+        for gt in gts:
+            m = re.search(r"Icon_GradeType([0-9]+)", str(gt[0]))
+            if m:
+                if m.group(1) == "13":
+                    is_win5 = "1"
+                else:
+                    grade_id = int(m.group(1))
+        rnm = soup.select_one(".RaceName").contents[0].strip()
+        if grade_id == 99:
+            grade_id = NetkeibaScraper._get_grade_id_by_name(rnm)
+        return grade_id, is_win5
+
+    @staticmethod
+    def _get_grade_id_by_name(name):
+        if "新馬" in name:
+            return 10
+        if "未勝利" in name:
+            return 9
+        if "1勝" in name or "１勝" in name or "500万" in name or "５００万" in name:
+            return 8
+        if "2勝" in name or "２勝" in name or "1000万" in name or "１０００万" in name:
+            return 7
+        if "3勝" in name or "３勝" in name or "1600万" in name or "１６００万" in name:
+            return 6
+        if "OP" in name or "オープン" in name:
+            return 5
+        if "(L)" in name or "（L）" in name or "リステッド" in name:
+            return 4
+        return 99
+
+    @staticmethod
+    def _get_race_condition(soup):
+        rd2 = soup.select_one(".RaceData02")
+        for c in rd2.contents:
+            m = re.search(r"[^ \t<>/]+歳[^ \t<>/]*", str(c))
+            if m:
+                return m.group()
+        return None
+
+    @staticmethod
+    def _get_num_of_horses(soup):
+        rd2 = soup.select_one(".RaceData02")
+        for c in rd2.contents:
+            m = re.search(r"(\d+)頭", str(c))
+            if m:
+                return m.group(1)
+        return 99
+
+    @staticmethod
+    def _get_weather(soup):
+        rd1 = soup.select_one(".RaceData01")
+        for c in rd1.contents:
+            m = re.search(r"天候:([^ \t/<]+)", str(c))
+            if m:
+                return m.group(1)
+        return None
+
+    @staticmethod
+    def _get_race_start(soup):
+        rd1 = soup.select_one(".RaceData01")
+        for c in rd1.contents:
+            m = re.search(r"\d+:\d+", str(c))
+            if m:
+                return m.group()
+        return None
+
+    @staticmethod
+    def _get_going(soup):
+        rd2 = soup.select_one(".RaceData02")
+        for c in rd2.contents:
+            m = re.search(r"馬場:([^ \t/<]+)", str(c))
+            if m:
+                return m.group(1)
+        return None
+
+    @staticmethod
+    def _get_handicap(soup):
+        rd2 = soup.select_one(".RaceData02")
+        for c in rd2.contents:
+            if "定量" in str(c):
+                return "定量"
+            if "馬齢" in str(c):
+                return "馬齢"
+            if "別定" in str(c):
+                return "別定"
+            if "ハンデ" in str(c):
+                return "ハンデ"
+        return None
+
+    @staticmethod
+    def _get_corner_orders(soup):
+        l = []
+        for td in soup.select_one(".Corner_Num").find_all("td"):
+            l.append(td.text)
+        return l
+
+    @staticmethod
+    def _get_pace(soup):
+        m = re.search(r"ペース:([^ \t/<]+)", soup.select_one(".RapPace_Title").text)
+        if m:
+            return m.group(1)
+        return None
+
+    @staticmethod
+    def _get_lap_times(race_id, soup):
+        l = []
+        l_d = soup.select_one(".Race_HaronTime").select_one(".Header").find_all("th")
+        l_t = soup.select_one(".Race_HaronTime").select(".HaronTime")[1].find_all("td")
+        for (d, t) in zip(l_d, l_t):
+            lap_time = race.RaceLapTimes()
+            lap_time.race_id = race_id
+            lap_time.lap_distance = d.text.strip()
+            lap_time.lap_time = t.text.strip()
+            l.append(lap_time)
+        return l
+
+    @staticmethod
+    def _get_race_umas(race_id, soup):
+        l = []
+        for horse in soup.select(".HorseList"):
+            uma = race.RaceUma()
+            uma.race_id = race_id
+            uma.uma_id = NetkeibaScraper._get_uma_id(horse)
+            c = horse.find_all("td")
+            uma.result = c[0].strip()
+            uma.bracket_number = c[1].strip()
+            uma.horse_number = c[2].strip()
+            l.append(uma)
+        return l
+
+    @staticmethod
+    def _get_uma_id(horse_list_tag):
+        m = re.search(r"[0-9]+", horse_list_tag.select_one(".Horse_Name a")["href"])
+        if m:
+            return m.group()
+        return None
 
