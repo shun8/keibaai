@@ -181,6 +181,7 @@ class NetkeibaScraper:
         race_data.grade_id, race_data.is_win5 = NetkeibaScraper._get_grade_id(soup)
         race_data.condition = NetkeibaScraper._get_race_condition(soup)
         race_data.handicap = NetkeibaScraper._get_handicap(soup)
+        race_data.race_date = NetkeibaScraper._get_race_date(race_id, soup)
         race_data.race_start = NetkeibaScraper._get_race_start(soup)
         race_data.weather = NetkeibaScraper._get_weather(soup)
         race_data.going = NetkeibaScraper._get_going(soup)
@@ -200,6 +201,13 @@ class NetkeibaScraper:
 
         race_lap_times = NetkeibaScraper._get_lap_times(race_id, soup)
         race_umas = NetkeibaScraper._get_race_umas(race_id, soup)
+
+        return race_data, race_lap_times, race_umas
+
+    @staticmethod
+    def _get_race_date(race_id, soup):
+        l = re.findall(r"\d+", soup.find("dd", class_="Active").text)
+        return race_id[0:4] + f"{l[0]:0>2}{l[1]:0>2}"
 
     @staticmethod
     def _get_grade_id(soup):
@@ -317,7 +325,7 @@ class NetkeibaScraper:
         for (d, t) in zip(l_d, l_t):
             lap_time = race.RaceLapTimes()
             lap_time.race_id = race_id
-            lap_time.lap_distance = d.text.strip()
+            lap_time.lap_distance = re.sub(r"\D", "", d.text.strip())
             lap_time.lap_time = t.text.strip()
             l.append(lap_time)
         return l
@@ -330,15 +338,51 @@ class NetkeibaScraper:
             uma.race_id = race_id
             uma.uma_id = NetkeibaScraper._get_uma_id(horse)
             c = horse.find_all("td")
-            uma.result = c[0].strip()
+            result = c[0].strip()
+            if "除" in result:
+                uma.is_excluded = 1
+            if "中" in result:
+                uma.is_demoted = 1
+            else:
+                uma.result = result
             uma.bracket_number = c[1].strip()
             uma.horse_number = c[2].strip()
+            uma.gender = re.sub(r"[0-9]+", "", c[4].text.strip())
+            uma.age = re.sub(r"\D", "", c[4].strip())
+            uma.weight_to_carry = c[5].strip()
+            uma.jockey_id = NetkeibaScraper._get_jockey_id(horse)
+            uma.time = c[7].strip()
+            uma.margin = c[8].strip()
+            uma.ninki = c[9].strip()
+            uma.win_odds = c[10].strip()
+            uma.final_3_furlong = c[11].strip()
+            uma.corner_order = c[12].strip()
+            uma.trainer_id = NetkeibaScraper._get_trainer_id(horse)
+            uma.horse_weight = re.sub(r"\(.*\)", "", c[14].text.strip())
+            m = re.search(r"\((-?[0-9]+)\)", "", c[14].text.strip())
+            if m:
+                uma.gain_and_loss_weight = m.group(1)
+
             l.append(uma)
         return l
 
     @staticmethod
     def _get_uma_id(horse_list_tag):
         m = re.search(r"[0-9]+", horse_list_tag.select_one(".Horse_Name a")["href"])
+        if m:
+            return m.group()
+        return None
+
+    @staticmethod
+    def _get_jockey_id(horse_list_tag):
+        m = re.search(r"[0-9]+", horse_list_tag.select_one(".Jockey a")["href"])
+        if m:
+            return m.group()
+        return None
+
+    @staticmethod
+    def _get_trainer_id(horse_list_tag):
+        m = re.search(r"[0-9]+", horse_list_tag.select_one(".Trainer a")["href"])
         if m:
             return m.group()
         return None
