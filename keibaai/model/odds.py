@@ -1,4 +1,5 @@
 import sqlalchemy
+import sqlalchemy.orm
 from sqlalchemy import Column, BigInteger, DateTime, Float, SmallInteger, Numeric
 
 base = sqlalchemy.orm.declarative_base()

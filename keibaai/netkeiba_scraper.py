@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import sys
+import time
 import datetime
 import pytz
 from selenium import webdriver
@@ -52,6 +53,8 @@ class NetkeibaScraper:
         self.base_url = "https://db.netkeiba.com/"
         # ?year=2021&month=1
         self.race_calendar_url = "https://race.netkeiba.com/top/calendar.html"
+        # ?kaisai_date=20210131
+        self.race_list_url="https://race.netkeiba.com/top/race_list.html"
         # ?race_id=202110010611&type=b1
         self.race_odds_url = "https://race.netkeiba.com/odds/index.html"
 
@@ -60,20 +63,30 @@ class NetkeibaScraper:
         self.driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
 
     @logging
-    def request_races_urls(self, year, month):
+    def request_kaisai_dates(self, year, month):
         payload = {"year": year, "month": month}
         r = requests.get(self.race_calendar_url, params=payload)
+        soup = BeautifulSoup(r.text, "html.parser")
+        race_links = soup.find_all("a", attrs={"target": "_parent"})
+        hrefs = [x.attrs["href"] for x in race_links if "kaisai_date" in x.attrs["href"]]
+        kaisai_dates = []
+        for href in hrefs:
+            kaisai_dates.append(re.search(r"\d{8}", href).group())
 
-        r.text
-
-        return r.text
+        return kaisai_dates
 
     @logging
     def request_win_odds(self, race_id):
         payload = {"race_id": race_id, "type": "b1"}
-        r = requests.get(self.race_odds_url, params=payload)
-        r.encoding = r.apparent_encoding
-        soup = BeautifulSoup(r.text, "html.parser")
+
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
+        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+
+        qs = urllib.parse.urlencode(payload)
+        driver.get(self.race_odds_url + "?" + qs)
+        html = driver.page_source
+        soup = BeautifulSoup(html, "html.parser")
 
         last_updated = self._get_last_updated(soup)
         odds_list = []
@@ -85,7 +98,7 @@ class NetkeibaScraper:
             m.race_id = race_id
             m.horse_number = u
             o = odds_tag.contents[0]
-            m.odds = o if self._is_float(o) else '0'
+            m.odds = float(o) if self._is_float(o) else 0.0
             m.last_updated = last_updated
             odds_list.append(m)
 
@@ -94,9 +107,15 @@ class NetkeibaScraper:
     @logging
     def request_place_odds(self, race_id):
         payload = {"race_id": race_id, "type": "b2"}
-        r = requests.get(self.race_odds_url, params=payload)
-        r.encoding = r.apparent_encoding
-        soup = BeautifulSoup(r.text, "html.parser")
+
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
+        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+
+        qs = urllib.parse.urlencode(payload)
+        driver.get(self.race_odds_url + "?" + qs)
+        html = driver.page_source
+        soup = BeautifulSoup(html, "html.parser")
 
         last_updated = self._get_last_updated(soup)
         odds_list = []
@@ -110,8 +129,8 @@ class NetkeibaScraper:
             o_list = odds_tag.contents[0].split("-", 1)
             if len(o_list) != 2:
                 continue
-            m.odds_min = o_list[0].strip() if self._is_float(o_list[0]) else '0'
-            m.odds_max = o_list[1].strip() if self._is_float(o_list[1]) else '0'
+            m.odds_min = float(o_list[0]) if self._is_float(o_list[0]) else 0.0
+            m.odds_max = float(o_list[1]) if self._is_float(o_list[1]) else 0.0
             m.last_updated = last_updated
             odds_list.append(m)
 
@@ -228,20 +247,49 @@ class NetkeibaScraper:
 
     @staticmethod
     def _get_grade_id_by_name(name):
+        if "Jpn3" in name or "jpn3" in name or "JPN3" in name:
+            return 21
+        if "Jpn2" in name or "jpn2" in name or "JPN2" in name:
+            return 20
+        if "Jpn1" in name or "jpn1" in name or "JPN1" in name:
+            return 19
+
         if "新馬" in name:
-            return 10
+            return 31
         if "未勝利" in name:
+            return 30
+        if "1勝" in name or "１勝" in name:
+            return 18
+        if "500万" in name or "５００万" in name:
             return 9
-        if "1勝" in name or "１勝" in name or "500万" in name or "５００万" in name:
+        if "2勝" in name or "２勝" in name:
+            return 17
+        if "900万" in name or "９００万" in name:
             return 8
-        if "2勝" in name or "２勝" in name or "1000万" in name or "１０００万" in name:
+        if "1000万" in name or "１０００万" in name:
             return 7
-        if "3勝" in name or "３勝" in name or "1600万" in name or "１６００万" in name:
+        if "3勝" in name or "３勝" in name:
+            return 16
+        if "1600万" in name or "１６００万" in name:
             return 6
         if "OP" in name or "オープン" in name:
             return 5
         if "(L)" in name or "（L）" in name or "リステッド" in name:
+            return 15
+        if "重賞" in name:
             return 4
+        if "JG3" in name or "ＪＧ３" in name:
+            return 12
+        if "G3" in name or "Ｇ３" in name:
+            return 3
+        if "JG2" in name or "ＪＧ２" in name:
+            return 11
+        if "G2" in name or "Ｇ２" in name:
+            return 2
+        if "JG1" in name or "ＪＧ１" in name:
+            return 10
+        if "G1" in name or "Ｇ１" in name:
+            return 1
         return 99
 
     @staticmethod
@@ -305,6 +353,8 @@ class NetkeibaScraper:
 
     @staticmethod
     def _get_corner_orders(soup):
+        if not soup.select_one(".Corner_Num"):
+            return []
         l = []
         for td in soup.select_one(".Corner_Num").find_all("td"):
             l.append(td.text)

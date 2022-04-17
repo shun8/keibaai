@@ -1,8 +1,9 @@
 from re import S
-import sqlalchemy
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, BigInteger, Date, Float, Integer, Interval, SmallInteger, String, Time
 
-base = sqlalchemy.orm.declarative_base()
+base = declarative_base()
+
 
 class Race(base):
     __tablename__ = 'races'
@@ -55,8 +56,8 @@ class RaceUma(base):
     trainer_id = Column(Integer)
     horse_weight = Column(SmallInteger)
     gain_and_loss_weight = Column(SmallInteger)
-    is_excluded = Column(String)
-    is_demoted = Column(String)
+    is_excluded = Column(String, default="0")
+    is_demoted = Column(String, default="0")
 
     def __repr__(self):
         return "<RaceUma(bracket_number='%s', horse_number='%s', result='%s')>" % (
