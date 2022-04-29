@@ -110,6 +110,5 @@ SELECT 'trio' AS way
         + (rp2.first_prob / 100) * (rp3.second_prob / 100) * (rp1.third_prob / 100)
         + (rp3.first_prob / 100) * (rp1.second_prob / 100) * (rp2.third_prob / 100)
         + (rp3.first_prob / 100) * (rp2.second_prob / 100) * (rp1.third_prob / 100)) * od.odds > 1
-UNION ALL
  ORDER BY expectation DESC
 ;
