@@ -8,8 +8,10 @@ import sys
 import time
 import datetime
 import pytz
+import selenium
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support.select import Select
 import urllib
 from keibaai.model.race import Race
 
@@ -139,23 +141,223 @@ class NetkeibaScraper:
     @logging
     def request_quinella_place_odds(self, race_id):
         payload = {"race_id": race_id, "type": "b5"}
-        r = requests.get(self.race_odds_url, params=payload)
-        r.encoding = r.apparent_encoding
-        soup = BeautifulSoup(r.text, "html.parser")
+
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
+        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+
+        qs = urllib.parse.urlencode(payload)
+        driver.get(self.race_odds_url + "?" + qs)
+        html = driver.page_source
+        soup = BeautifulSoup(html, "html.parser")
 
         last_updated = self._get_last_updated(soup)
         odds_list = []
-        for u in range(1, 30):
-            odds_tag = soup.select_one(f"#odds-5-{u:02}")
-            if odds_tag is None:
+        for u1 in range(1, 30):
+            for u2 in range(u1 + 1, 30):
+                odds_tag = soup.select_one(f"#odds-5-{u1:02}{u2:02}")
+                oddsmin_tag = soup.select_one(f"#oddsmin-5-{u1:02}{u2:02}")
+                if odds_tag is None:
+                    break
+                m = odds.QuinellaPlaceOdds()
+                m.race_id = race_id
+                m.horse_number_1 = u1
+                m.horse_number_2 = u2
+                o_max = odds_tag.contents[0]
+                m.odds_max = float(o_max) if self._is_float(o_max) else 0.0
+                o_min = oddsmin_tag.contents[0]
+                m.odds_min = float(o_min) if self._is_float(o_min) else 0.0
+                m.last_updated = last_updated
+                odds_list.append(m)
+
+        return odds_list
+
+    @logging
+    def request_bracket_quinella_odds(self, race_id):
+        payload = {"race_id": race_id, "type": "b3"}
+
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
+        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+
+        qs = urllib.parse.urlencode(payload)
+        driver.get(self.race_odds_url + "?" + qs)
+        html = driver.page_source
+        soup = BeautifulSoup(html, "html.parser")
+
+        last_updated = self._get_last_updated(soup)
+        odds_list = []
+        for b1 in range(1, 10):
+            for b2 in range(b1 + 1, 10):
+                odds_tag = soup.select_one(f"#odds-3-{b1:02}{b2:02}")
+                if odds_tag is None:
+                    break
+                m = odds.BracketQuinellaOdds()
+                m.race_id = race_id
+                m.bracket_number_1 = b1
+                m.bracket_number_2 = b2
+                o = odds_tag.contents[0]
+                m.odds = float(o) if self._is_float(o) else 0.0
+                m.last_updated = last_updated
+                odds_list.append(m)
+
+        return odds_list
+
+    @logging
+    def request_exacta_odds(self, race_id):
+        payload = {"race_id": race_id, "type": "b6"}
+
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
+        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+
+        qs = urllib.parse.urlencode(payload)
+        driver.get(self.race_odds_url + "?" + qs)
+        html = driver.page_source
+        soup = BeautifulSoup(html, "html.parser")
+
+        last_updated = self._get_last_updated(soup)
+        odds_list = []
+        for u1 in range(1, 30):
+            for u2 in range(1, 30):
+                if u1 == u2:
+                    continue
+                odds_tag = soup.select_one(f"#odds-6-{u1:02}{u2:02}")
+                if odds_tag is None:
+                    break
+                m = odds.ExactaOdds()
+                m.race_id = race_id
+                m.horse_number_1 = u1
+                m.horse_number_2 = u2
+                o = odds_tag.contents[0]
+                m.odds = float(o) if self._is_float(o) else 0.0
+                m.last_updated = last_updated
+                odds_list.append(m)
+
+        return odds_list
+
+    @logging
+    def request_quinella_odds(self, race_id):
+        payload = {"race_id": race_id, "type": "b4"}
+
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
+        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+
+        qs = urllib.parse.urlencode(payload)
+        driver.get(self.race_odds_url + "?" + qs)
+        html = driver.page_source
+        soup = BeautifulSoup(html, "html.parser")
+
+        last_updated = self._get_last_updated(soup)
+        odds_list = []
+        for u1 in range(1, 30):
+            for u2 in range(u1 + 1, 30):
+                odds_tag = soup.select_one(f"#odds-4-{u1:02}{u2:02}")
+                if odds_tag is None:
+                    break
+                m = odds.QuinellaOdds()
+                m.race_id = race_id
+                m.horse_number_1 = u1
+                m.horse_number_2 = u2
+                o = odds_tag.contents[0]
+                m.odds = float(o) if self._is_float(o) else 0.0
+                m.last_updated = last_updated
+                odds_list.append(m)
+
+        return odds_list
+
+    @logging
+    def request_trifecta_odds(self, race_id, sleep_sec=1):
+        payload = {"race_id": race_id, "type": "b8"}
+
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
+        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+
+        qs = urllib.parse.urlencode(payload)
+        driver.get(self.race_odds_url + "?" + qs)
+
+        html = driver.page_source
+        soup = BeautifulSoup(html, "html.parser")
+
+        last_updated = self._get_last_updated(soup)
+        odds_list = []
+        for u1 in range(1, 30):
+            select_element = driver.find_element_by_id("list_select_horse")
+            select_object = Select(select_element)
+            try:
+                select_object.select_by_value(str(u1))
+            except selenium.common.exceptions.NoSuchElementException:
                 break
-            m = odds.WinOdds()
-            m.race_id = race_id
-            m.horse_number = u
-            o = odds_tag.contents[0]
-            m.odds = o if self._is_float(o) else '0'
-            m.last_updated = last_updated
-            odds_list.append(m)
+
+            time.sleep(sleep_sec)
+            html = driver.page_source
+            soup = BeautifulSoup(html, "html.parser")
+
+            for u2 in range(1, 30):
+                if u1 == u2:
+                    continue
+                for u3 in range(1, 30):
+                    if u1 == u3 or u2 == u3:
+                        continue
+                    odds_tag = soup.select_one(f"#odds-8-{u1:02}{u2:02}{u3:02}")
+                    if odds_tag is None:
+                        break
+                    m = odds.TrifectaOdds()
+                    m.race_id = race_id
+                    m.horse_number_1 = u1
+                    m.horse_number_2 = u2
+                    m.horse_number_3 = u3
+                    o = odds_tag.contents[0]
+                    m.odds = float(o) if self._is_float(o) else 0.0
+                    m.last_updated = last_updated
+                    odds_list.append(m)
+
+        return odds_list
+
+    @logging
+    def request_trio_odds(self, race_id, sleep_sec=1):
+        payload = {"race_id": race_id, "type": "b7"}
+
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
+        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+
+        qs = urllib.parse.urlencode(payload)
+        driver.get(self.race_odds_url + "?" + qs)
+
+        html = driver.page_source
+        soup = BeautifulSoup(html, "html.parser")
+
+        last_updated = self._get_last_updated(soup)
+        odds_list = []
+        for u1 in range(1, 30):
+            select_element = driver.find_element_by_id("list_select_horse")
+            select_object = Select(select_element)
+            try:
+                select_object.select_by_value(str(u1))
+            except selenium.common.exceptions.NoSuchElementException:
+                break
+
+            time.sleep(sleep_sec)
+            html = driver.page_source
+            soup = BeautifulSoup(html, "html.parser")
+
+            for u2 in range(u1 + 1, 30):
+                for u3 in range(u2 + 1, 30):
+                    odds_tag = soup.select_one(f"#odds-7-{u1:02}{u2:02}{u3:02}")
+                    if odds_tag is None:
+                        break
+                    m = odds.TrioOdds()
+                    m.race_id = race_id
+                    m.horse_number_1 = u1
+                    m.horse_number_2 = u2
+                    m.horse_number_3 = u3
+                    o = odds_tag.contents[0]
+                    m.odds = float(o) if self._is_float(o) else 0.0
+                    m.last_updated = last_updated
+                    odds_list.append(m)
 
         return odds_list
 
