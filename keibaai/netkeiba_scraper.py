@@ -188,7 +188,7 @@ class NetkeibaScraper:
         last_updated = self._get_last_updated(soup)
         odds_list = []
         for b1 in range(1, 10):
-            for b2 in range(b1 + 1, 10):
+            for b2 in range(b1, 10):
                 odds_tag = soup.select_one(f"#odds-3-{b1:02}{b2:02}")
                 if odds_tag is None:
                     break
