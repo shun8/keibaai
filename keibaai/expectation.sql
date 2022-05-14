@@ -23,8 +23,12 @@ UNION ALL
 SELECT 'quinella_place' AS way
      , TO_CHAR(od.horse_number_1) || '-' || TO_CHAR(od.horse_number_2) AS bet
      , od.odds_min AS odds
-     , ((rp1.first_prob + rp1.second_prob + rp1.third_prob) / 100) * ((rp2.first_prob + rp2.second_prob + rp2.third_prob) / 100) AS prob
-     , ((rp1.first_prob + rp1.second_prob + rp1.third_prob) / 100) * ((rp2.first_prob + rp2.second_prob + rp2.third_prob) / 100) * od.odds_min AS expectation
+     , (rp1.first_prob / 100) * ((rp2.second_prob + rp2.third_prob) / 100)
+       + (rp1.second_prob / 100) * ((rp2.first_prob + rp2.third_prob) / 100)
+       + (rp1.third_prob / 100) * ((rp2.first_prob + rp2.second_prob) / 100) AS prob
+     , ((rp1.first_prob / 100) * ((rp2.second_prob + rp2.third_prob) / 100)
+       + (rp1.second_prob / 100) * ((rp2.first_prob + rp2.third_prob) / 100)
+       + (rp1.third_prob / 100) * ((rp2.first_prob + rp2.second_prob) / 100)) * od.odds_min AS expectation
   FROM quinella_place_odds od
  INNER JOIN race_predict rp1
     ON od.race_id = rp1.race_id
