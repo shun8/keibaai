@@ -32,8 +32,8 @@ class Race(base):
     pace = Column(String(1))
 
     def __repr__(self):
-        return "<Race(name='%s', grade='%s', date='%s')>" % (
-                            self.name, self.grade, self.date)
+        return "<Race(id='%s', name='%s', race_track_id='%s', kai='%s', nichi='%s', race_no='%s', course_id='%s', grade_id='%s', is_win5='%s', condition='%s', handicap='%s', race_date='%s', race_start='%s', weather='%s', going='%s', num_of_horses='%s', race_data='%s', corner_order_1='%s', corner_order_2='%s', corner_order_3='%s', corner_order_4='%s', pace='%s')>" % (
+                self.id, self.name, self.race_track_id, self.kai, self.nichi, self.race_no, self.course_id, self.grade_id, self.is_win5, self.condition, self.handicap, self.race_date, self.race_start, self.weather, self.going, self.num_of_horses, self.race_data, self.corner_order_1, self.corner_order_2, self.corner_order_3, self.corner_order_4, self.pace)
 
 class RaceUma(base):
     __tablename__ = 'race_uma'
@@ -60,8 +60,8 @@ class RaceUma(base):
     is_demoted = Column(String, default="0")
 
     def __repr__(self):
-        return "<RaceUma(bracket_number='%s', horse_number='%s', result='%s')>" % (
-                            self.bracket_number, self.horse_number, self.result)
+        return "<RaceUma(race_id='%s', uma_id='%s', result='%s', bracket_number='%s', horse_number='%s', gender='%s', age='%s', weight_to_carry='%s', jockey_id='%s', time='%s', margin='%s', ninki='%s', win_odds='%s', final_3_furlong='%s', corner_order='%s', trainer_id='%s', horse_weight='%s', gain_and_loss_weight='%s', is_excluded='%s', is_demoted='%s')>" % (
+                self.race_id, self.uma_id, self.result, self.bracket_number, self.horse_number, self.gender, self.age, self.weight_to_carry, self.jockey_id, self.time, self.margin, self.ninki, self.win_odds, self.final_3_furlong, self.corner_order, self.trainer_id, self.horse_weight, self.gain_and_loss_weight, self.is_excluded, self.is_demoted)
 
 class RaceLapTimes(base):
     __tablename__ = 'race_lap_times'
@@ -71,5 +71,5 @@ class RaceLapTimes(base):
     lap_time = Column(Float)
 
     def __repr__(self):
-        return "<RaceUma(lap_distance='%s', lap_time='%s'>" % (
-                            self.lap_distance, self.lap_time)
+        return "<RaceLapTimes(race_id='%s', lap_distance='%s', lap_time='%s'>" % (
+                self.race_id, self.lap_distance, self.lap_time)

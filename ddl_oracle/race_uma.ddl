@@ -1,6 +1,6 @@
 CREATE TABLE race_uma (
-    race_id NUMBER(12),
-    uma_id NUMBER(10),
+    race_id CHAR(12),
+    uma_id CHAR(10),
     result NUMBER(2),
     bracket_number NUMBER(1),
     horse_number NUMBER(2),
@@ -14,7 +14,7 @@ CREATE TABLE race_uma (
     win_odds NUMBER(6,1),
     final_3_furlong NUMBER(3,1),
     corner_order VARCHAR(12),
-    trainer_id NUMBER(5) NOT NULL,
+    trainer_id CHAR(5) NOT NULL,
     horse_weight NUMBER(3),
     gain_and_loss_weight NUMBER(2),
     is_excluded CHAR(1),

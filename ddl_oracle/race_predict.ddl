@@ -1,5 +1,5 @@
 CREATE TABLE race_predict (
-    race_id NUMBER(12),
+    race_id CHAR(12),
     bracket_number NUMBER(1),
     horse_number NUMBER(2),
     uma_name VARCHAR2(40),

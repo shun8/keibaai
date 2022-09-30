@@ -36,7 +36,9 @@ SELECT 'quinella_place' AS way
  INNER JOIN race_predict rp2
     ON od.race_id = rp2.race_id
    AND od.horse_number_2 = rp2.horse_number
- WHERE ((rp1.first_prob + rp1.second_prob + rp1.third_prob) / 100) * ((rp2.first_prob + rp2.second_prob + rp2.third_prob) / 100) * od.odds_min > 1
+ WHERE ((rp1.first_prob / 100) * ((rp2.second_prob + rp2.third_prob) / 100)
+       + (rp1.second_prob / 100) * ((rp2.first_prob + rp2.third_prob) / 100)
+       + (rp1.third_prob / 100) * ((rp2.first_prob + rp2.second_prob) / 100)) * od.odds_min > 1
 UNION ALL
 SELECT 'exacta' AS way
      , TO_CHAR(od.horse_number_1) || '-' || TO_CHAR(od.horse_number_2) AS bet

@@ -59,6 +59,8 @@ class NetkeibaScraper:
         self.race_list_url="https://race.netkeiba.com/top/race_list.html"
         # ?race_id=202110010611&type=b1
         self.race_odds_url = "https://race.netkeiba.com/odds/index.html"
+        # ?race_id=202110010611
+        self.race_result_url = "https://race.netkeiba.com/race/result.html"
 
         options = webdriver.ChromeOptions()
         options.add_argument('--headless')
@@ -76,6 +78,22 @@ class NetkeibaScraper:
             kaisai_dates.append(re.search(r"\d{8}", href).group())
 
         return kaisai_dates
+
+    @logging
+    def request_race_data(self, race_id):
+        payload = {"race_id": race_id}
+
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
+        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+
+        qs = urllib.parse.urlencode(payload)
+        driver.get(self.race_result_url + "?" + qs)
+        html = driver.page_source
+        soup = BeautifulSoup(html, "html.parser")
+
+        race_data, race_lap_times, race_umas = NetkeibaScraper._get_race_data(race_id, soup)
+        return race_data, race_lap_times, race_umas
 
     @logging
     def request_win_odds(self, race_id):
@@ -428,7 +446,7 @@ class NetkeibaScraper:
     @staticmethod
     def _get_race_date(race_id, soup):
         l = re.findall(r"\d+", soup.find("dd", class_="Active").text)
-        return race_id[0:4] + f"{l[0]:0>2}{l[1]:0>2}"
+        return datetime.date(int(race_id[0:4]), int(l[0]), int(l[1]))
 
     @staticmethod
     def _get_grade_id(soup):
@@ -436,7 +454,7 @@ class NetkeibaScraper:
         is_win5 = "0"
         gts = soup.select(".Icon_GradeType")
         for gt in gts:
-            m = re.search(r"Icon_GradeType([0-9]+)", str(gt[0]))
+            m = re.search(r"Icon_GradeType([0-9]+)", str(gt))
             if m:
                 if m.group(1) == "13":
                     is_win5 = "1"
@@ -532,7 +550,7 @@ class NetkeibaScraper:
 
     @staticmethod
     def _get_going(soup):
-        rd2 = soup.select_one(".RaceData02")
+        rd2 = soup.select_one(".RaceData01")
         for c in rd2.contents:
             m = re.search(r"馬場:([^ \t/<]+)", str(c))
             if m:
@@ -590,30 +608,33 @@ class NetkeibaScraper:
             uma.race_id = race_id
             uma.uma_id = NetkeibaScraper._get_uma_id(horse)
             c = horse.find_all("td")
-            result = c[0].strip()
+            result = c[0].text.strip()
             if "除" in result:
                 uma.is_excluded = 1
-            if "中" in result:
+            elif "中" in result:
                 uma.is_demoted = 1
             else:
                 uma.result = result
-            uma.bracket_number = c[1].strip()
-            uma.horse_number = c[2].strip()
+                uma.is_excluded = 0
+                uma.is_demoted = 0
+            uma.bracket_number = c[1].text.strip()
+            uma.horse_number = c[2].text.strip()
             uma.gender = re.sub(r"[0-9]+", "", c[4].text.strip())
-            uma.age = re.sub(r"\D", "", c[4].strip())
-            uma.weight_to_carry = c[5].strip()
+            uma.age = re.sub(r"\D", "", c[4].text.strip())
+            uma.weight_to_carry = c[5].text.strip()
             uma.jockey_id = NetkeibaScraper._get_jockey_id(horse)
-            uma.time = c[7].strip()
-            uma.margin = c[8].strip()
-            uma.ninki = c[9].strip()
-            uma.win_odds = c[10].strip()
-            uma.final_3_furlong = c[11].strip()
-            uma.corner_order = c[12].strip()
+            t = c[7].text.strip().split(":")
+            uma.time = int(t[0]) * 60 + float(t[1])
+            uma.margin = c[8].text.strip()
+            uma.ninki = c[9].text.strip()
+            uma.win_odds = c[10].text.strip()
+            uma.final_3_furlong = c[11].text.strip()
+            uma.corner_order = c[12].text.strip()
             uma.trainer_id = NetkeibaScraper._get_trainer_id(horse)
             uma.horse_weight = re.sub(r"\(.*\)", "", c[14].text.strip())
-            m = re.search(r"\((-?[0-9]+)\)", "", c[14].text.strip())
+            m = re.search(r"\(-?[0-9]+\)", c[14].text.strip())
             if m:
-                uma.gain_and_loss_weight = m.group(1)
+                uma.gain_and_loss_weight = m.group().strip("()")
 
             l.append(uma)
         return l

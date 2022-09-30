@@ -1,5 +1,5 @@
 CREATE TABLE win_odds (
-    race_id NUMBER(12),
+    race_id CHAR(12),
     horse_number NUMBER(2),
     odds NUMBER(6,1),
     last_updated TIMESTAMP,
@@ -7,7 +7,7 @@ CREATE TABLE win_odds (
 );
 
 CREATE TABLE place_odds (
-    race_id NUMBER(12),
+    race_id CHAR(12),
     horse_number NUMBER(2),
     odds_min NUMBER(6,1),
     odds_max NUMBER(6,1),
@@ -16,7 +16,7 @@ CREATE TABLE place_odds (
 );
 
 CREATE TABLE quinella_place_odds (
-    race_id NUMBER(12),
+    race_id CHAR(12),
     horse_number_1 NUMBER(2),
     horse_number_2 NUMBER(2),
     odds_min NUMBER(6,1),
@@ -26,7 +26,7 @@ CREATE TABLE quinella_place_odds (
 );
 
 CREATE TABLE bracket_quinella_odds (
-    race_id NUMBER(12),
+    race_id CHAR(12),
     bracket_number_1 NUMBER(1),
     bracket_number_2 NUMBER(1),
     odds NUMBER(6,1),
@@ -35,7 +35,7 @@ CREATE TABLE bracket_quinella_odds (
 );
 
 CREATE TABLE exacta_odds (
-    race_id NUMBER(12),
+    race_id CHAR(12),
     horse_number_1 NUMBER(2),
     horse_number_2 NUMBER(2),
     odds NUMBER(6,1),
@@ -44,7 +44,7 @@ CREATE TABLE exacta_odds (
 );
 
 CREATE TABLE quinella_odds (
-    race_id NUMBER(12),
+    race_id CHAR(12),
     horse_number_1 NUMBER(2),
     horse_number_2 NUMBER(2),
     odds NUMBER(6,1),
@@ -53,7 +53,7 @@ CREATE TABLE quinella_odds (
 );
 
 CREATE TABLE trifecta_odds (
-    race_id NUMBER(12),
+    race_id CHAR(12),
     horse_number_1 NUMBER(2),
     horse_number_2 NUMBER(2),
     horse_number_3 NUMBER(2),
@@ -63,7 +63,7 @@ CREATE TABLE trifecta_odds (
 );
 
 CREATE TABLE trio_odds (
-    race_id NUMBER(12),
+    race_id CHAR(12),
     horse_number_1 NUMBER(2),
     horse_number_2 NUMBER(2),
     horse_number_3 NUMBER(2),

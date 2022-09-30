@@ -1,0 +1,13 @@
+DROP TABLE courses;
+DROP TABLE win_odds;
+DROP TABLE place_odds;
+DROP TABLE quinella_place_odds;
+DROP TABLE bracket_quinella_odds;
+DROP TABLE exacta_odds;
+DROP TABLE quinella_odds;
+DROP TABLE trifecta_odds;
+DROP TABLE trio_odds;
+DROP TABLE race_lap_times;
+DROP TABLE race_predict;
+DROP TABLE race_uma;
+DROP TABLE races;
