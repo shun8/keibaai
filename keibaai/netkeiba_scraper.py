@@ -632,9 +632,9 @@ class NetkeibaScraper:
             uma.corner_order = c[12].text.strip()
             uma.trainer_id = NetkeibaScraper._get_trainer_id(horse)
             uma.horse_weight = re.sub(r"\(.*\)", "", c[14].text.strip())
-            m = re.search(r"\(-?[0-9]+\)", c[14].text.strip())
+            m = re.search(r"\(-?\+?[0-9]+\)", c[14].text.strip())
             if m:
-                uma.gain_and_loss_weight = m.group().strip("()")
+                uma.gain_and_loss_weight = m.group().strip("(+)")
 
             l.append(uma)
         return l
