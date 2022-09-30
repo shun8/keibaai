@@ -69,8 +69,16 @@ class NetkeibaScraper:
     @logging
     def request_kaisai_dates(self, year, month):
         payload = {"year": year, "month": month}
-        r = requests.get(self.race_calendar_url, params=payload)
-        soup = BeautifulSoup(r.text, "html.parser")
+
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
+        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+
+        qs = urllib.parse.urlencode(payload)
+        driver.get(self.race_calendar_url + "?" + qs)
+        html = driver.page_source
+        soup = BeautifulSoup(html, "html.parser")
+
         race_links = soup.find_all("a", attrs={"target": "_parent"})
         hrefs = [x.attrs["href"] for x in race_links if "kaisai_date" in x.attrs["href"]]
         kaisai_dates = []
@@ -78,6 +86,23 @@ class NetkeibaScraper:
             kaisai_dates.append(re.search(r"\d{8}", href).group())
 
         return kaisai_dates
+
+    @logging
+    def request_race_ids(self, kaisai_date):
+        payload = {"kaisai_date": kaisai_date}
+
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
+        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+
+        qs = urllib.parse.urlencode(payload)
+        driver.get(self.race_list_url + "?" + qs)
+        html = driver.page_source
+        soup = BeautifulSoup(html, "html.parser")
+
+        all_links = soup.find_all("a")
+        race_ids =  [re.search(r"\d+", x.attrs["href"]).group() for x in all_links if "result.html" in x.attrs.get("href", "no href")]
+        return race_ids
 
     @logging
     def request_race_data(self, race_id):
@@ -582,6 +607,9 @@ class NetkeibaScraper:
 
     @staticmethod
     def _get_pace(soup):
+        if not soup.select_one(".RapPace_Title"):
+            return None
+
         m = re.search(r"ペース:([^ \t/<]+)", soup.select_one(".RapPace_Title").text)
         if m:
             return m.group(1)
@@ -589,6 +617,9 @@ class NetkeibaScraper:
 
     @staticmethod
     def _get_lap_times(race_id, soup):
+        if not soup.select_one(".Race_HaronTime"):
+            return None
+
         l = []
         l_d = soup.select_one(".Race_HaronTime").select_one(".Header").find_all("th")
         l_t = soup.select_one(".Race_HaronTime").select(".HaronTime")[1].find_all("td")
@@ -621,14 +652,22 @@ class NetkeibaScraper:
             uma.horse_number = c[2].text.strip()
             uma.gender = re.sub(r"[0-9]+", "", c[4].text.strip())
             uma.age = re.sub(r"\D", "", c[4].text.strip())
-            uma.weight_to_carry = c[5].text.strip()
+            w = c[5].text.strip()
+            uma.weight_to_carry = w if w else None
             uma.jockey_id = NetkeibaScraper._get_jockey_id(horse)
             t = c[7].text.strip().split(":")
-            uma.time = int(t[0]) * 60 + float(t[1])
+            if len(t) > 1:
+                minute = t[0] if t[0] else "0"
+                second = t[1] if t[1] else "0"
+                uma.time = int(minute) * 60 + float(second)
+            else:
+                uma.time = None
+
             uma.margin = c[8].text.strip()
             uma.ninki = c[9].text.strip()
             uma.win_odds = c[10].text.strip()
-            uma.final_3_furlong = c[11].text.strip()
+            f = c[11].text.strip()
+            uma.final_3_furlong = f if f else None
             uma.corner_order = c[12].text.strip()
             uma.trainer_id = NetkeibaScraper._get_trainer_id(horse)
             uma.horse_weight = re.sub(r"\(.*\)", "", c[14].text.strip())

@@ -35,6 +35,12 @@ class Race(base):
         return "<Race(id='%s', name='%s', race_track_id='%s', kai='%s', nichi='%s', race_no='%s', course_id='%s', grade_id='%s', is_win5='%s', condition='%s', handicap='%s', race_date='%s', race_start='%s', weather='%s', going='%s', num_of_horses='%s', race_data='%s', corner_order_1='%s', corner_order_2='%s', corner_order_3='%s', corner_order_4='%s', pace='%s')>" % (
                 self.id, self.name, self.race_track_id, self.kai, self.nichi, self.race_no, self.course_id, self.grade_id, self.is_win5, self.condition, self.handicap, self.race_date, self.race_start, self.weather, self.going, self.num_of_horses, self.race_data, self.corner_order_1, self.corner_order_2, self.corner_order_3, self.corner_order_4, self.pace)
 
+class ErrorRace(base):
+    __tablename__ = 'error_races'
+    id = Column(String(12), primary_key=True)
+    def __repr__(self):
+        return "<ErrorRace(id='%s')>" % (self.id)
+
 class RaceUma(base):
     __tablename__ = 'race_uma'
 
