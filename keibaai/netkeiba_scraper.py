@@ -70,13 +70,9 @@ class NetkeibaScraper:
     def request_kaisai_dates(self, year, month):
         payload = {"year": year, "month": month}
 
-        options = webdriver.ChromeOptions()
-        options.add_argument('--headless')
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-
         qs = urllib.parse.urlencode(payload)
-        driver.get(self.race_calendar_url + "?" + qs)
-        html = driver.page_source
+        self.driver.get(self.race_calendar_url + "?" + qs)
+        html = self.driver.page_source
         soup = BeautifulSoup(html, "html.parser")
 
         race_links = soup.find_all("a", attrs={"target": "_parent"})
@@ -91,13 +87,9 @@ class NetkeibaScraper:
     def request_race_ids(self, kaisai_date):
         payload = {"kaisai_date": kaisai_date}
 
-        options = webdriver.ChromeOptions()
-        options.add_argument('--headless')
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-
         qs = urllib.parse.urlencode(payload)
-        driver.get(self.race_list_url + "?" + qs)
-        html = driver.page_source
+        self.driver.get(self.race_list_url + "?" + qs)
+        html = self.driver.page_source
         soup = BeautifulSoup(html, "html.parser")
 
         all_links = soup.find_all("a")
@@ -108,13 +100,9 @@ class NetkeibaScraper:
     def request_race_data(self, race_id):
         payload = {"race_id": race_id}
 
-        options = webdriver.ChromeOptions()
-        options.add_argument('--headless')
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-
         qs = urllib.parse.urlencode(payload)
-        driver.get(self.race_result_url + "?" + qs)
-        html = driver.page_source
+        self.driver.get(self.race_result_url + "?" + qs)
+        html = self.driver.page_source
         soup = BeautifulSoup(html, "html.parser")
 
         race_data, race_lap_times, race_umas = NetkeibaScraper._get_race_data(race_id, soup)
@@ -124,13 +112,9 @@ class NetkeibaScraper:
     def request_win_odds(self, race_id):
         payload = {"race_id": race_id, "type": "b1"}
 
-        options = webdriver.ChromeOptions()
-        options.add_argument('--headless')
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-
         qs = urllib.parse.urlencode(payload)
-        driver.get(self.race_odds_url + "?" + qs)
-        html = driver.page_source
+        self.driver.get(self.race_odds_url + "?" + qs)
+        html = self.driver.page_source
         soup = BeautifulSoup(html, "html.parser")
 
         last_updated = self._get_last_updated(soup)
@@ -153,13 +137,9 @@ class NetkeibaScraper:
     def request_place_odds(self, race_id):
         payload = {"race_id": race_id, "type": "b2"}
 
-        options = webdriver.ChromeOptions()
-        options.add_argument('--headless')
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-
         qs = urllib.parse.urlencode(payload)
-        driver.get(self.race_odds_url + "?" + qs)
-        html = driver.page_source
+        self.driver.get(self.race_odds_url + "?" + qs)
+        html = self.driver.page_source
         soup = BeautifulSoup(html, "html.parser")
 
         last_updated = self._get_last_updated(soup)
@@ -185,13 +165,9 @@ class NetkeibaScraper:
     def request_quinella_place_odds(self, race_id):
         payload = {"race_id": race_id, "type": "b5"}
 
-        options = webdriver.ChromeOptions()
-        options.add_argument('--headless')
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-
         qs = urllib.parse.urlencode(payload)
-        driver.get(self.race_odds_url + "?" + qs)
-        html = driver.page_source
+        self.driver.get(self.race_odds_url + "?" + qs)
+        html = self.driver.page_source
         soup = BeautifulSoup(html, "html.parser")
 
         last_updated = self._get_last_updated(soup)
@@ -219,13 +195,9 @@ class NetkeibaScraper:
     def request_bracket_quinella_odds(self, race_id):
         payload = {"race_id": race_id, "type": "b3"}
 
-        options = webdriver.ChromeOptions()
-        options.add_argument('--headless')
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-
         qs = urllib.parse.urlencode(payload)
-        driver.get(self.race_odds_url + "?" + qs)
-        html = driver.page_source
+        self.driver.get(self.race_odds_url + "?" + qs)
+        html = self.driver.page_source
         soup = BeautifulSoup(html, "html.parser")
 
         last_updated = self._get_last_updated(soup)
@@ -250,13 +222,9 @@ class NetkeibaScraper:
     def request_exacta_odds(self, race_id):
         payload = {"race_id": race_id, "type": "b6"}
 
-        options = webdriver.ChromeOptions()
-        options.add_argument('--headless')
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-
         qs = urllib.parse.urlencode(payload)
-        driver.get(self.race_odds_url + "?" + qs)
-        html = driver.page_source
+        self.driver.get(self.race_odds_url + "?" + qs)
+        html = self.driver.page_source
         soup = BeautifulSoup(html, "html.parser")
 
         last_updated = self._get_last_updated(soup)
@@ -283,13 +251,9 @@ class NetkeibaScraper:
     def request_quinella_odds(self, race_id):
         payload = {"race_id": race_id, "type": "b4"}
 
-        options = webdriver.ChromeOptions()
-        options.add_argument('--headless')
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-
         qs = urllib.parse.urlencode(payload)
-        driver.get(self.race_odds_url + "?" + qs)
-        html = driver.page_source
+        self.driver.get(self.race_odds_url + "?" + qs)
+        html = self.driver.page_source
         soup = BeautifulSoup(html, "html.parser")
 
         last_updated = self._get_last_updated(soup)
@@ -314,20 +278,16 @@ class NetkeibaScraper:
     def request_trifecta_odds(self, race_id, sleep_sec=1):
         payload = {"race_id": race_id, "type": "b8"}
 
-        options = webdriver.ChromeOptions()
-        options.add_argument('--headless')
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-
         qs = urllib.parse.urlencode(payload)
-        driver.get(self.race_odds_url + "?" + qs)
+        self.driver.get(self.race_odds_url + "?" + qs)
 
-        html = driver.page_source
+        html = self.driver.page_source
         soup = BeautifulSoup(html, "html.parser")
 
         last_updated = self._get_last_updated(soup)
         odds_list = []
         for u1 in range(1, 30):
-            select_element = driver.find_element_by_id("list_select_horse")
+            select_element = self.driver.find_element_by_id("list_select_horse")
             select_object = Select(select_element)
             try:
                 select_object.select_by_value(str(u1))
@@ -335,7 +295,7 @@ class NetkeibaScraper:
                 break
 
             time.sleep(sleep_sec)
-            html = driver.page_source
+            html = self.driver.page_source
             soup = BeautifulSoup(html, "html.parser")
 
             for u2 in range(1, 30):
@@ -363,20 +323,16 @@ class NetkeibaScraper:
     def request_trio_odds(self, race_id, sleep_sec=1):
         payload = {"race_id": race_id, "type": "b7"}
 
-        options = webdriver.ChromeOptions()
-        options.add_argument('--headless')
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-
         qs = urllib.parse.urlencode(payload)
-        driver.get(self.race_odds_url + "?" + qs)
+        self.driver.get(self.race_odds_url + "?" + qs)
 
-        html = driver.page_source
+        html = self.driver.page_source
         soup = BeautifulSoup(html, "html.parser")
 
         last_updated = self._get_last_updated(soup)
         odds_list = []
         for u1 in range(1, 30):
-            select_element = driver.find_element_by_id("list_select_horse")
+            select_element = self.driver.find_element_by_id("list_select_horse")
             select_object = Select(select_element)
             try:
                 select_object.select_by_value(str(u1))
@@ -384,7 +340,7 @@ class NetkeibaScraper:
                 break
 
             time.sleep(sleep_sec)
-            html = driver.page_source
+            html = self.driver.page_source
             soup = BeautifulSoup(html, "html.parser")
 
             for u2 in range(u1 + 1, 30):
