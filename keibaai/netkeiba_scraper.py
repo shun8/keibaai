@@ -643,6 +643,9 @@ class NetkeibaScraper:
 
     @staticmethod
     def _get_jockey_id(horse_list_tag):
+        if not horse_list_tag.select_one(".Jockey a"):
+            return None
+
         m = re.search(r"[0-9]+", horse_list_tag.select_one(".Jockey a")["href"])
         if m:
             return m.group()
@@ -650,6 +653,9 @@ class NetkeibaScraper:
 
     @staticmethod
     def _get_trainer_id(horse_list_tag):
+        if not horse_list_tag.select_one(".Trainer a"):
+            return None
+
         m = re.search(r"[0-9]+", horse_list_tag.select_one(".Trainer a")["href"])
         if m:
             return m.group()
