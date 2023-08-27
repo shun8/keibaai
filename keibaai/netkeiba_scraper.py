@@ -375,13 +375,13 @@ class NetkeibaScraper:
         last_updated.replace(
                 second=0, 
                 microsecond=0)
-        official_time_tag = soup.select_one("#official_time")
-        if official_time_tag is not None:
-            time_str = re.search(r"\d+:\d+", official_time_tag.contents[0]).group()
-            l = time_str.split(":")
-            last_updated.replace(
-                    hour=int(l[0]),
-                    minute=int(l[1]))
+        # official_time_tag = soup.select_one("#official_time")
+        # if official_time_tag is not None:
+        #     time_str = re.search(r"\d+:\d+", official_time_tag.contents[0]).group()
+        #     l = time_str.split(":")
+        #     last_updated.replace(
+        #             hour=int(l[0]),
+        #             minute=int(l[1]))
         return last_updated
 
     @staticmethod
