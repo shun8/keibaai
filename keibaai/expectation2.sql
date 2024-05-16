@@ -18,8 +18,8 @@ SELECT rp.race_id AS race_id
      , rp.second AS second
      , rp.third AS third
      , rp.prob AS prob
-     , od.odds AS odds
-     , rp.prob * od.odds AS expectation
+     , od.odds_min AS odds
+     , rp.prob * od.odds_min AS expectation
   FROM place_odds od
  INNER JOIN race_predict2 rp
     ON rp.way = 'place'
@@ -32,8 +32,8 @@ SELECT rp.race_id AS race_id
      , rp.second AS second
      , rp.third AS third
      , rp.prob AS prob
-     , od.odds AS odds
-     , rp.prob * od.odds AS expectation
+     , od.odds_min AS odds
+     , rp.prob * od.odds_min AS expectation
   FROM quinella_place_odds od
  INNER JOIN race_predict2 rp
     ON rp.way = 'quinella_place'
