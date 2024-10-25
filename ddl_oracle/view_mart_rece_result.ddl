@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW agg_race_first_time AS
+CREATE OR REPLACE VIEW mart_race_result AS
 SELECT r.course_id
      , SUBSTR(r.course_id, 4, 1) AS surface
      , u.gender

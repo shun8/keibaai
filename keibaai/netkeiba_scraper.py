@@ -10,8 +10,10 @@ import datetime
 import pytz
 import selenium
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 import urllib
 from keibaai.model.race import Race
 
@@ -63,8 +65,9 @@ class NetkeibaScraper:
         self.race_result_url = "https://race.netkeiba.com/race/result.html"
 
         options = webdriver.ChromeOptions()
-        options.add_argument('--headless')
-        self.driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+        options.add_argument("--headless=new")
+        service = Service(executable_path=ChromeDriverManager().install())
+        self.driver = webdriver.Chrome(options=options, service=service)
 
     @logging
     def request_kaisai_dates(self, year, month):
@@ -287,7 +290,7 @@ class NetkeibaScraper:
         last_updated = self._get_last_updated(soup)
         odds_list = []
         for u1 in range(1, 30):
-            select_element = self.driver.find_element_by_id("list_select_horse")
+            select_element = self.driver.find_element(By.ID ,"list_select_horse")
             select_object = Select(select_element)
             try:
                 select_object.select_by_value(str(u1))
@@ -332,7 +335,7 @@ class NetkeibaScraper:
         last_updated = self._get_last_updated(soup)
         odds_list = []
         for u1 in range(1, 30):
-            select_element = self.driver.find_element_by_id("list_select_horse")
+            select_element = self.driver.find_element(By.ID, "list_select_horse")
             select_object = Select(select_element)
             try:
                 select_object.select_by_value(str(u1))
